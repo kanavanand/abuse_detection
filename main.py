@@ -1,3 +1,4 @@
+from logging import disable
 import joblib
 import streamlit as st
 
@@ -6,7 +7,7 @@ vec = joblib.load('vector.joblib')
 
 
 @st.cache(suppress_st_warning=True)
-def generate_summary(text):
+def generate_summary(text,my_text):
     """
     Generate probablity given text
     """
@@ -16,27 +17,74 @@ def generate_summary(text):
 ################################## UI ##############################################
 
 def st_ui():
-    st.write("# Welcome to the abuse detection Daisi!")
+    st.set_page_config(
+        page_title="Abuse detection-indian-languages",
+        page_icon="🍲",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
+
+    st.write("# Multi-Lingual Abuse Detection")
+    with st.expander("ℹ️ - About this app", expanded=True):
+        st.write(
+            """     
+    -   The *Abuse detectionr* app is an easy-to-use interface built in Streamlit for detecting abuse in multiple-indian-languages.
+    -   It is using sklearn models to make predictions and can widely be used in detecting abuse on twitter or any other type of social media.
+            """
+        )
+
+    st.markdown("")
+
     st.markdown(
         """
-            This daisi allows you to obtain a abuse detection of text.
+            This Daisi allows you to detect the abuse detection in indian Languages
         """
     )
-    col1, col2 = st.columns([1,1])
+    col1, col2 = st.columns([6, 4])
     with col1:
-        st.title("Text")
-        my_text = st.text_area("", "what the fuck is wrong with you?", height=300, key='text_key')
+        st.markdown("Select the Language", unsafe_allow_html=True)
+        language = st.selectbox("Select the Language", index=0, options=["English",'Hindi', 'Telugu', 'Marathi', 'Tamil', 'Malayalam', 'Bengali',
+       'Kannada', 'Odia', 'Gujarati', 'Haryanvi', 'Bhojpuri', 'Rajasthani',
+       'Assamese'])
+        st.markdown("Type the comment in below box")
+        my_text = st.text_area("", "what the fuck is wrong with you?", key='text_key')
     with col2:
-        st.title("Abuse detection")
-        sum_text = st.empty()
-        sum_text.text_area("", "", height=300, disabled=True)
+        st.markdown("### 🔑 Languages supported")
+        with st.expander("Where did this story start?", expanded=True):
+            # st.markdown(meta.STORY, unsafe_allow_html=True)
+            st.write("""
+        - English
+        - Hindi
+        - Punjabi
+        - Telugu
+        - Marathi 
+        - Tamil 
+        - Malayalam 
+        - Bengali
+        - Kannada 
+        - Odia
+        - Gujarati
+        - Haryanvi
+        - Bhojpuri
+        - Rajasthani
+        - Assamese'
+        """,disabled=True)
+        # sum_text.text_area("", "",  disabled=True)
         
+
     generate_btn = st.button('Generate')
-    if generate_btn:
-        sum_text.text_area("", "Generating...", height=300, disabled=True)
-        summary = generate_summary(my_text)
-        sum_text.text_area("", summary, height=300)
-                
+
+    st.markdown(
+            "<hr />",
+            unsafe_allow_html=True
+        )
+
+    if generate_btn:        
+        with st.spinner("Generating recipe..."):
+            st.title("Results - ")
+            summary = generate_summary(my_text,my_text)
+            st.markdown("Probability:-" + str(summary))
+                    
 
     
 if __name__ == "__main__":
