@@ -33,6 +33,9 @@ def preprocess(text):
 
 ################################## UI ##############################################
 def st_ui():
+    '''
+    Streamlit UI
+    '''
     st.set_page_config(
         page_title="Abuse detection-indian-languages",
         page_icon="🍲",
