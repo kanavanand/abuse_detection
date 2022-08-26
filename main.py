@@ -18,11 +18,20 @@ def generate_summary(text,language):
 	Returns : A probab score which tells scale of abuse
 
 	'''
+    text = preprocess(text)
     pred_ = clf.predict_proba(vec.transform([text]))[0][1]
     return pred_
 
-################################## UI ##############################################
 
+def preprocess(text):
+    '''
+    Takes string and apply various pre-processing functions
+    '''
+    return text
+
+
+
+################################## UI ##############################################
 def st_ui():
     st.set_page_config(
         page_title="Abuse detection-indian-languages",
