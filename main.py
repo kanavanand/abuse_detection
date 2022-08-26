@@ -1,16 +1,26 @@
 from logging import disable
 import joblib
-import streamlit as st
+import streamlit run as st
 
 clf = joblib.load('model.joblib')
 vec = joblib.load('vector.joblib')
 
 
 @st.cache(suppress_st_warning=True)
-def generate_summary(text,my_text):
-    """
-    Generate probablity given text
-    """
+def generate_summary(text,language):
+
+    '''
+	Computes the probability of abuse given text and language. 
+
+	Parameters:
+	- text (str) : This can be any text in string form
+	- language (str) :  Make sure you are passing language from given list 
+
+	Returns : A probab score which tells scale of abuse
+
+	'''
+
+    
     pred_ = clf.predict_proba(vec.transform([text]))[0][1]
     return pred_
 
