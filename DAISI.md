@@ -37,4 +37,4 @@ Steps used for training text models
 - Training LGB model 
 
 
-Model is gives 91% roc and latency is ~10 ms
+Model gives 91% roc and latency is ~10 ms

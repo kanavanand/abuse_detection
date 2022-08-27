@@ -1,13 +1,36 @@
-from logging import disable
 import joblib
 import streamlit as st
+from logging import disable
+from scipy.sparse import coo_matrix, hstack
 
-clf = joblib.load('model.joblib')
-vec = joblib.load('vector.joblib')
+
+clf = joblib.load('model_files/model_new.joblib')
+vec = joblib.load('model_files/vector_new.joblib')
+standard_languages = ['Hindi', 'Telugu', 'Marathi', 'Tamil', 'Malayalam', 'Bengali',
+       'Kannada', 'Odia', 'Gujarati', 'Haryanvi', 'Bhojpuri', 'Rajasthani',
+       'Assamese']
+standard_languages = sorted(standard_languages)
+map_languages = dict(zip(standard_languages,list(range(len(standard_languages)))))
+
+
+
+
+
+def process_language(language):
+    code = 5
+    try:
+        code = map_languages[language]
+    except:
+        code = 5
+    vector= [0]*len(map_languages)
+    vector[code]=1
+    return vector
+    
+
 
 
 @st.cache(suppress_st_warning=True)
-def generate_summary(text,language):
+def generate_probab(text,language):
     '''
 	Computes the probability of abuse given text and language. 
 
@@ -19,13 +42,23 @@ def generate_summary(text,language):
 
 	'''
     text = preprocess(text)
-    pred_ = clf.predict_proba(vec.transform([text]))[0][1]
+    language_vector = process_language(language)
+    csr_matrix_vector = coo_matrix(language_vector)
+
+    text_vector = vec.transform([text])
+    merged_vector = hstack([text_vector , csr_matrix_vector])
+    pred_ = clf.predict_proba(merged_vector)[0][1]
     return pred_
 
 
 def preprocess(text):
     '''
     Takes string and apply various pre-processing functions
+
+    Parameters:
+    -text (str): This will take text
+
+    Return : preprocessed text with cleaned version
     '''
     return text
 
@@ -101,7 +134,7 @@ def st_ui():
     if generate_btn:        
         with st.spinner("Generating recipe..."):
             st.title("Results - ")
-            summary = generate_summary(my_text,my_text)
+            summary = generate_probab(my_text,language)
             st.markdown("Probability:-" + str(summary))
                     
 
