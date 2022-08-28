@@ -1,31 +1,14 @@
 import joblib
+import re
 import streamlit as st
 from logging import disable
 from scipy.sparse import coo_matrix, hstack
-
+from preprocess import preprocess_text,process_language
 
 clf = joblib.load('model_files/model_new.joblib')
 vec = joblib.load('model_files/vector_new.joblib')
-standard_languages = ['Hindi', 'Telugu', 'Marathi', 'Tamil', 'Malayalam', 'Bengali',
-       'Kannada', 'Odia', 'Gujarati', 'Haryanvi', 'Bhojpuri', 'Rajasthani',
-       'Assamese']
-standard_languages = sorted(standard_languages)
-map_languages = dict(zip(standard_languages,list(range(len(standard_languages)))))
 
 
-
-
-
-def process_language(language):
-    code = 5
-    try:
-        code = map_languages[language]
-    except:
-        code = 5
-    vector= [0]*len(map_languages)
-    vector[code]=1
-    return vector
-    
 
 
 
@@ -41,7 +24,7 @@ def generate_probab(text,language):
 	Returns : A probab score which tells scale of abuse
 
 	'''
-    text = preprocess(text)
+    text = preprocess_text(text)
     language_vector = process_language(language)
     csr_matrix_vector = coo_matrix(language_vector)
 
@@ -49,18 +32,6 @@ def generate_probab(text,language):
     merged_vector = hstack([text_vector , csr_matrix_vector])
     pred_ = clf.predict_proba(merged_vector)[0][1]
     return pred_
-
-
-def preprocess(text):
-    '''
-    Takes string and apply various pre-processing functions
-
-    Parameters:
-    -text (str): This will take text
-
-    Return : preprocessed text with cleaned version
-    '''
-    return text
 
 
 
@@ -134,6 +105,7 @@ def st_ui():
     if generate_btn:        
         with st.spinner("Generating recipe..."):
             st.title("Results - ")
+            
             summary = generate_probab(my_text,language)
             st.markdown("Probability:-" + str(summary))
                     
